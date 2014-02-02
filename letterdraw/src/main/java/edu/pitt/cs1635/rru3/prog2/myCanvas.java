@@ -20,35 +20,55 @@ public class myCanvas extends View implements View.OnTouchListener{
     Paint myPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private Path path = new Path();
     boolean newSegment = false;
-    int measuredHeight = getMeasuredHeight();
-    int measuredWidth = getMeasuredWidth();
+    private int myHeight;
+    private int myWidth;
+    public StringBuilder toServer;
+    private boolean firstTouch;
+
 
     ArrayList<Point> myPoints = new ArrayList<Point>();
     public myCanvas(Context context, AttributeSet attrs) {
         super(context, attrs);
         this.setOnTouchListener(this);
         setMyPaint(myPaint);
-
+        toServer = new StringBuilder();
+        firstTouch = true;
     }
     @Override
     protected void onDraw(Canvas canvas){
-        Log.i(TAG,Integer.toString(canvas.getHeight()));
+        myHeight = canvas.getHeight();
+        myWidth = canvas.getWidth();
+        //Log.i(TAG,"AGAIN");
         canvas.drawPath(path, myPaint);
     }
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
         Point point = new Point();
+        point.x = (int)((event.getX()/myWidth)*254);
+        point.y = (int)((event.getY()/myHeight)*254);
+        Log.i(TAG,"Coords: "+point.x+" "+point.y);
         myPoints.add(point);
+        //Log.i(TAG,"Width "+myWidth);
+        //Log.i(TAG,"Height "+myHeight);
         if(newSegment){
             if(event.getAction() == MotionEvent.ACTION_UP){
                 newSegment = false;
             }
+            toServer.append(", "+point.x+", "+point.y);
             path.lineTo(event.getX(),event.getY());
         }
         else{
             newSegment = true;
-            path.moveTo(event.getX(),event.getY());
+            if(firstTouch){
+                toServer.append("["+point.x+", "+point.y);
+                firstTouch=false;
+            }
+            else{
+                toServer.append(", 255, 0, "+point.x+", "+point.y);
+            }
+            Log.i(TAG,"My String: "+toServer.toString());
+            path.moveTo(event.getX(), event.getY());
         }
         invalidate();
         return true;
@@ -61,21 +81,33 @@ public class myCanvas extends View implements View.OnTouchListener{
         this.myPaint.setStrokeWidth(3);
     }
 
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-
-        int parentWidth = MeasureSpec.getSize(widthMeasureSpec);
-        int parentHeight = MeasureSpec.getSize(heightMeasureSpec);
-        this.setMeasuredDimension(
-                parentWidth, parentHeight);
-        Log.i(TAG,Integer.toString(parentWidth));
-        Log.i(TAG,Integer.toString(parentHeight));
+    public void reset(){
+        firstTouch = true;
+        newSegment = false;
+        toServer = new StringBuilder();
+        path = new Path();
+        invalidate();
     }
-
+    public void onClick(View view){
+        int buttonPressed = view.getId();
+        switch(buttonPressed){
+            case R.id.blue_button:
+                this.myPaint.setColor(Color.BLUE);
+                break;
+            case R.id.red_button:
+                this.myPaint.setColor(Color.RED);
+                break;
+            case R.id.black_button:
+                this.myPaint.setColor(Color.BLACK);
+                break;
+            case R.id.green_button:
+                this.myPaint.setColor(Color.GREEN);
+                break;
+        }
+    }
 }
 class Point {
-    float x, y;
+    int x, y;
 
     @Override
     public String toString() {
