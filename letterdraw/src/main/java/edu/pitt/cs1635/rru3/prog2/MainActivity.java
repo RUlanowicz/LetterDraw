@@ -1,5 +1,6 @@
 package edu.pitt.cs1635.rru3.prog2;
 
+import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
@@ -14,12 +15,18 @@ import android.os.Build;
 import android.widget.Button;
 import android.widget.TextView;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
 import org.w3c.dom.Text;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.InjectView;
@@ -47,9 +54,7 @@ public class MainActivity extends ActionBarActivity {
             public void onClick(View v) {
                 inMain = myC.toServer.toString()+ ", 255, 255]";
                 try{
-                    answer = new SendPoints().execute(inMain).get();
-                    TextView op = (TextView)findViewById(R.id.answer);
-                    op.setText(answer);
+                    new SendPoints().execute(inMain);
                 }
                 catch(Exception E){
                     Log.i(TAG,"Concurrent");
@@ -106,4 +111,43 @@ public class MainActivity extends ActionBarActivity {
             return rootView;
         }
     }
+
+
+    public class SendPoints extends AsyncTask<String, Void, String> {
+        TextView ans = null;
+        @Override
+        protected String doInBackground(String... params) {
+            final String key = "11773edfd643f813c18d82f56a8104ed";
+            final String url = "http://cwritepad.appspot.com/reco/usen";
+            String answer = null;
+
+            HttpClient client = new DefaultHttpClient();
+            HttpPost post = new HttpPost(url);
+            List<NameValuePair> data = new ArrayList<NameValuePair>();
+            data.add(new BasicNameValuePair("key",key));
+            data.add(new BasicNameValuePair("q",params[0]));
+            try{
+                post.setEntity(new UrlEncodedFormEntity(data));
+                HttpResponse response = client.execute(post);
+                HttpEntity entity = response.getEntity();
+                answer = EntityUtils.toString(entity);
+            }
+            catch(Exception e){
+                Log.i("SendPoints","broken");
+            }
+            return answer;
+        }
+
+        @Override
+        protected void onPostExecute(String result){
+            ans.setText(result);
+        }
+
+        @Override
+        protected void onPreExecute(){
+            ans = (TextView)findViewById(R.id.answer);
+        }
+
+    }
+
 }
