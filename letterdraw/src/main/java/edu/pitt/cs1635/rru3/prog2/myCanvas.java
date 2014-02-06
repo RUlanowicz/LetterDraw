@@ -47,10 +47,7 @@ public class myCanvas extends View implements View.OnTouchListener{
         Point point = new Point();
         point.x = (int)((event.getX()/myWidth)*254);
         point.y = (int)((event.getY()/myHeight)*254);
-        Log.i(TAG,"Coords: "+point.x+" "+point.y);
         myPoints.add(point);
-        //Log.i(TAG,"Width "+myWidth);
-        //Log.i(TAG,"Height "+myHeight);
         if(newSegment){
             if(event.getAction() == MotionEvent.ACTION_UP){
                 newSegment = false;
@@ -81,29 +78,16 @@ public class myCanvas extends View implements View.OnTouchListener{
         this.myPaint.setStrokeWidth(3);
     }
 
+    public void setMyColor(int myColor){
+        this.myPaint.setColor(myColor);
+    }
+
     public void reset(){
         firstTouch = true;
         newSegment = false;
         toServer = new StringBuilder();
         path = new Path();
         invalidate();
-    }
-    public void onClick(View view){
-        int buttonPressed = view.getId();
-        switch(buttonPressed){
-            case R.id.blue_button:
-                this.myPaint.setColor(Color.BLUE);
-                break;
-            case R.id.red_button:
-                this.myPaint.setColor(Color.RED);
-                break;
-            case R.id.black_button:
-                this.myPaint.setColor(Color.BLACK);
-                break;
-            case R.id.green_button:
-                this.myPaint.setColor(Color.GREEN);
-                break;
-        }
     }
 }
 class Point {

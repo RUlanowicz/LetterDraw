@@ -1,5 +1,7 @@
 package edu.pitt.cs1635.rru3.prog2;
 
+import android.content.Intent;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
@@ -29,18 +31,17 @@ import org.w3c.dom.Text;
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.InjectView;
 
 public class MainActivity extends ActionBarActivity {
     private static final String TAG = "MainActivity";
     private String inMain;
-    private String answer;
+    private myCanvas myC;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        final myCanvas myC = (myCanvas)findViewById(R.id.myCustom);
+        myC = (myCanvas)findViewById(R.id.myCustom);
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.container, new PlaceholderFragment())
@@ -133,7 +134,7 @@ public class MainActivity extends ActionBarActivity {
                 answer = EntityUtils.toString(entity);
             }
             catch(Exception e){
-                Log.i("SendPoints","broken");
+                answer = "Exception";
             }
             return answer;
         }
@@ -150,4 +151,25 @@ public class MainActivity extends ActionBarActivity {
 
     }
 
+    public void onClick(View view){
+        int buttonPressed = view.getId();
+        switch(buttonPressed){
+            case R.id.blue_button:
+                myC.setMyColor(Color.BLUE);
+                break;
+            case R.id.red_button:
+                myC.setMyColor(Color.RED);
+                break;
+            case R.id.black_button:
+                myC.setMyColor(Color.BLACK);
+                break;
+            case R.id.green_button:
+                myC.setMyColor(Color.GREEN);
+                break;
+        }
+    }
+
+    public void colorListener(View view){
+        
+    }
 }
